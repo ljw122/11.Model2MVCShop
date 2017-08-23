@@ -1,30 +1,6 @@
 <%@ page contentType="text/html; charset=euc-kr" %>
 <%@ page pageEncoding="EUC-KR" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<!DOCTYPE html>
-
-<html>
-<head>
-	<title>Model2 MVC Shop</title>
-	<meta charset="EUC-KR">
-	
-	<!-- 참조 : http://getbootstrap.com/css/   -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	
-	<!--  ///////////////////////// Bootstrap, jQuery CDN ////////////////////////// -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
-	
-	<style>
-		body{
-			padding-top : 70px;
-		}
-	</style>
-	
 	<script type="text/javascript">
 		var currentPage = 0;
 		
@@ -73,7 +49,8 @@
 		}
 		
 		$( function() {
-			while($(document).height() == $(window).height() && currentPage < $('input:hidden[name="maxPage"]').val()){
+			while($(document).height() == $(window).height() && 
+					(currentPage < $('input:hidden[name="maxPage"]').val() || $('input:hidden[name="maxPage"]').val()==0)){
 				fncNextList();
 			}
 			
@@ -88,13 +65,7 @@
 			}
 		});
 	</script>
-</head>
 
-<body>
-
-	<jsp:include page="../layout/menubar.jsp">
-		<jsp:param name="uri" value="../"/>
-	</jsp:include>
 	
 	<input type="hidden" name="menu" value="${param.menu}"/>
 	<input type="hidden" name="maxPage" value="${resultPage.maxPage}"/>
@@ -112,6 +83,3 @@
 		</div>
 	</div>
 	
-</body>
-
-</html>

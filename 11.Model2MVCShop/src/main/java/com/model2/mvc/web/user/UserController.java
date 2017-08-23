@@ -90,20 +90,17 @@ public class UserController {
 		return "redirect:getUser?userId="+user.getUserId();
 	}
 	
-	@RequestMapping( value="login", method=RequestMethod.GET )
-	public String login() throws Exception{
-		return "redirect:loginView.jsp";
-	}
-	
 	@RequestMapping( value="login", method=RequestMethod.POST )
 	public String login( @ModelAttribute("user") User user, HttpSession session) throws Exception{
 		User dbUser = userService.getUser(user.getUserId());
 		
-		if(user.getPassword().equals(dbUser.getPassword())){
+		if(dbUser != null && user.getPassword().equals(dbUser.getPassword())){
 			session.setAttribute("user", dbUser);
+			return "redirect:../index.jsp";
+		}else{
+			return "redirect:loginView.jsp";
 		}
 		
-		return "redirect:../index.jsp";
 	}
 	
 	@RequestMapping( value="logout", method=RequestMethod.GET )

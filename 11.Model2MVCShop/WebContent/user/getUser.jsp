@@ -1,26 +1,35 @@
-<%@ page contentType="text/html; charset=EUC-KR"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ page contentType="text/html; charset=euc-kr" %>
+<%@ page pageEncoding="EUC-KR" %>
 
-<%-- root에서 실행 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
 
 <html>
 <head>
-	<title>회원정보조회</title>
+	<title>Model2 MVC Shop</title>
+	<meta charset="EUC-KR">
 	
-	<link rel="stylesheet" href="../css/admin.css" type="text/css">
+	<!-- 참조 : http://getbootstrap.com/css/   -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	
-	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<!--  ///////////////////////// Bootstrap, jQuery CDN ////////////////////////// -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
+
+	<style>
+		body{
+			padding-top : 70px;
+		}
+	</style>
+
 	<script type="text/javascript">
 		$(function(){
-			$('td.ct_btn01:contains("확인")').bind('click', function(){
-				history.go(-1);
+			$( "button" ).bind("click" , function() {
+				self.location.href = "updateUser?userId=${user.userId}"
 			});
-			
-			$('td.ct_btn01:contains("수정")').bind('click', function(){
-				self.location = 'updateUser?userId=${user.userId}'
-			});
-			
 		});
 	</script>
 	
@@ -28,125 +37,68 @@
 
 <body bgcolor="#ffffff" text="#000000">
 
-<table width="100%" height="37" border="0" cellpadding="0"	cellspacing="0">
-	<tr>
-		<td width="15" height="37">
-			<img src="../images/ct_ttl_img01.gif" width="15" height="37">
-		</td>
-		<td background="../images/ct_ttl_img02.gif" width="100%" style="padding-left:10px;">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="93%" class="ct_ttl01">회원정보조회</td>
-					<td width="20%" align="right">&nbsp;</td>
-				</tr>
-			</table>
-		</td>
-		<td width="12" height="37"><img src="../images/ct_ttl_img03.gif" width="12" height="37"></td>
-	</tr>
-</table>
+	<jsp:include page="../layout/menubar.jsp">
+		<jsp:param name="uri" value="../"/>
+	</jsp:include>
 
-<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:13px;">
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">
-			아이디 <img src="../images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="105">${user.userId}</td>
-					<td></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
+	<div class="container">
 	
-	<tr>
-		<td width="104" class="ct_write">
-			이름 <img src="../images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">${user.userName}</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">주소</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">${user.addr}</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">휴대전화번호</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">${user.phone}</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">이메일 </td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<table border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td height="26">${user.email}</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
+		<div class="page-header text-center">
+	       <h3 class=" text-info">회원정보조회</h3>
+	       <h5 class="text-muted">내 정보를 <strong class="text-danger">최신정보로 관리</strong>해 주세요.</h5>
+	    </div>
 	
-	<tr>
-		<td width="104" class="ct_write">가입일자</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">${user.regDate}</td>
-	</tr>
-
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-</table>
-
-<table width="100%" border="0" cellspacing="0" cellpadding="0"	style="margin-top:10px;">
-	<tr>
-		<td width="53%"></td>
-		<td align="right">
-			<table border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="17" height="23">
-						<img src="../images/ct_btnbg01.gif" width="17" height="23"/>
-					</td>
-					<td background="../images/ct_btnbg02.gif" class="ct_btn01" style="padding-top:3px;">
-						수정
-					</td>
-					<td width="14" height="23">
-						<img src="../images/ct_btnbg03.gif" width="14" height="23">
-					</td>
-					<td width="30"></td>					
-					<td width="17" height="23">
-						<img src="../images/ct_btnbg01.gif" width="17" height="23">
-					</td>
-					<td background="../images/ct_btnbg02.gif" class="ct_btn01" style="padding-top:3px;">
-						확인
-					</td>
-					<td width="14" height="23"><img src="../images/ct_btnbg03.gif" width="14" height="23"></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
+		<div class="row">
+	  		<div class="col-xs-4 col-md-2 col-md-offset-3"><strong>아 이 디</strong></div>
+			<div class="col-xs-8 col-md-4">${user.userId}</div>
+		</div>
+		
+		<hr/>
+		
+		<div class="row">
+	  		<div class="col-xs-4 col-md-2 col-md-offset-3 "><strong>이 름</strong></div>
+			<div class="col-xs-8 col-md-4">${user.userName}</div>
+		</div>
+		
+		<hr/>
+		
+		<div class="row">
+	  		<div class="col-xs-4 col-md-2  col-md-offset-3"><strong>주소</strong></div>
+			<div class="col-xs-8 col-md-4">${user.addr}</div>
+		</div>
+		
+		<hr/>
+		
+		<div class="row">
+	  		<div class="col-xs-4 col-md-2 col-md-offset-3 "><strong>휴대전화번호</strong></div>
+			<div class="col-xs-8 col-md-4">${ !empty user.phone ? user.phone : ''}	</div>
+		</div>
+		
+		<hr/>
+		
+		<div class="row">
+	  		<div class="col-xs-4 col-md-2 col-md-offset-3"><strong>이 메 일</strong></div>
+			<div class="col-xs-8 col-md-4">${user.email}</div>
+		</div>
+		
+		<hr/>
+		
+		<div class="row">
+	  		<div class="col-xs-4 col-md-2  col-md-offset-3"><strong>가입일자</strong></div>
+			<div class="col-xs-8 col-md-4">${user.regDate}</div>
+		</div>
+		
+		<hr/>
+		
+		<div class="row">
+	  		<div class="col-md-12 text-center ">
+	  			<button type="button" class="btn btn-primary">회원정보수정</button>
+	  		</div>
+		</div>
+		
+		<br/>
+		
+ 	</div>
 
 </body>
 </html>

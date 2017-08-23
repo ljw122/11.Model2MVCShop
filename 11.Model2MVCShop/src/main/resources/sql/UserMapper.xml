@@ -26,7 +26,7 @@
 			#{userName},
 			#{password},
 			'user',
-			#{ssn},
+			#{ssn:VARCHAR},
 			#{phone:VARCHAR},
 			#{addr:VARCHAR},
 			#{email:VARCHAR},

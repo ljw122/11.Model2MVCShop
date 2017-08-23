@@ -64,7 +64,7 @@
 		
 	<sql id="productList">
 		SELECT
-		p.prod_no, p.prod_name, p.price, p.reg_date, p.prod_detail, p.stock-NVL(COUNT(t.tran_no),0) stock
+		p.prod_no, p.prod_name, p.price, p.reg_date, p.prod_detail, p.stock-NVL(COUNT(t.tran_no),0) stock, p.image_file
 		FROM product p, transaction t
 		<where>
 			p.prod_no=t.prod_no(+)
@@ -84,7 +84,7 @@
 				</choose>
 			</if>
 		</where>
-		GROUP BY p.prod_no, p.prod_name, p.price, p.reg_date, p.prod_detail, p.stock, t.prod_no
+		GROUP BY p.prod_no, p.prod_name, p.price, p.reg_date, p.prod_detail, p.stock, t.prod_no, p.image_file
 		<trim prefix="HAVING" prefixOverrides="AND | OR">
 			<if test="!stockView">
 				p.stock-NVL(COUNT(t.tran_no),0) > 0
