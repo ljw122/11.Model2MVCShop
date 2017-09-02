@@ -92,8 +92,7 @@
 		
 		$(window).scroll(function(){
 			if(currentPage < $('input:hidden[name="maxPage"]').val()){
-				if(pageYOffset == $(document).height()-$(window).height()){
-					$(window).scrollTop(pageYOffset - 1);
+				if($(window).scrollTop() == $(document).height()-$(window).height()){
 					fncNextList();
 				}
 			}
