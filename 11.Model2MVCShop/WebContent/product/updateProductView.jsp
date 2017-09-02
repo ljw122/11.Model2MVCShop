@@ -1,16 +1,32 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
-<%-- root에서 실행 --%>
+<%@ page contentType="text/html; charset=euc-kr" %>
+<%@ page pageEncoding="EUC-KR" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
+
+<html>
 <head>
-	<title>상품정보수정</title>
+	<title>Model2 MVC Shop</title>
+	<meta charset="EUC-KR">
 	
-	<link rel="stylesheet" href="../css/admin.css" type="text/css">
+	<!-- 참조 : http://getbootstrap.com/css/   -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	
-	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script type="text/javascript" src="../javascript/calendar.js"></script>
+	<!--  ///////////////////////// Bootstrap, jQuery CDN ////////////////////////// -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
+	
+	<style>
+		body{
+			padding-top : 70px;
+		}
+	</style>
 	
 	<script type="text/javascript">
 		function fncUpdateProduct(){
@@ -20,7 +36,9 @@
 			var manuDate = $('input[name="manuDate"]').val();
 			var price = $('input[name="price"]').val();
 			var stock = $('input[name="stock"]').val();
-		
+			var formData = new FormData();
+			formData.append('file',$('input[name="file"]')[0].files[0]);
+			
 			if(name == null || name.length<1){
 				alert("상품명은 반드시 입력하여야 합니다.");
 				return;
@@ -28,6 +46,16 @@
 			if(detail == null || detail.length<1){
 				alert("상품상세정보는 반드시 입력하여야 합니다.");
 				return;
+			}
+			if(stock == null || stock == ''){
+				stock = 0;
+				$('input[name="stock"]').val(0);
+			}
+			if(stock != ''){
+				if(!$.isNumeric(stock)){
+					alert('수량은 숫자로 적어주세요.');
+					return;
+				}
 			}
 			if(manuDate == null || manuDate.length<1){
 				alert("제조일자는 반드시 입력하셔야 합니다.");
@@ -37,181 +65,169 @@
 				alert("가격은 반드시 입력하셔야 합니다.");
 				return;
 			}
-			if(stock == null || stock<0){
-				alert("최소 추가 수량은 0개 입니다.")
+			if(!$.isNumeric(price)){
+				alert('가격은 숫자로 적어주세요.');
 				return;
 			}
-				
-			$('form').attr('method','post').attr('action','updateProduct?prodNo=${product.prodNo}').attr('enctype','multipart/form-data').submit();
+
+			$('#myModal').modal('show');
+			if($('input[name="file"]')[0].files[0] != null){
+				$.ajax({
+					url : 'json/uploadFile',
+					method : 'post',
+					data : formData,
+					contentType:false,
+					processData:false,
+					success : function(){
+						window.setTimeout(modalOut,5000);
+						window.setTimeout(sendForm,5000);
+					},
+					error : function(jqXHR, status, error){
+						modalOut();
+						alert('등록에 실패했습니다. 잠시 후 다시 시도해 주세요..');
+					},
+					statusCode : {
+						404 : function(){
+							alert('404맨');
+						},
+						405 : function(){
+							alert('405맨');
+						},
+						400 : function(){
+							alert('400맨');
+						},
+						415 : function(){
+							alert('415맨');
+						}
+					}
+	
+				});
+			}else{
+				modalOut();
+				sendForm();
+			}
+			
 		}
-		
+	
+	
 		$(function(){
-			$('td.ct_btn01:contains("수정")').bind('click',function(){
+			$('button:contains("수정하기")').bind('click',function(){
 				fncUpdateProduct();
 			});
 			
-			$('td.ct_btn01:contains("취소")').bind('click',function(){
-				$('form')[0].reset();	
-			});
-			
-			$('td.ct_write01 img').bind('click',function(){
-				show_calendar('document.detailForm.manuDate', document.detailForm.manuDate.value);
-			});
-		});
+			$('#inputManuDate').datepicker({
+				dateFormat : 'yymmdd'
+			})
+		})
+		
+		function modalOut(){
+			$('#myModal').modal('hide');
+		}
+		
+		function sendForm(){
+			$('form.update-product').attr('method','post').attr('action','updateProduct').attr('enctype','multipart/form-data').submit();
+		}
+		
 
 	</script>
 </head>
 
 <body bgcolor="#ffffff" text="#000000">
 
-<form name="detailForm">
+	<jsp:include page="../layout/menubar.jsp">
+		<jsp:param name="uri" value="../"/>
+	</jsp:include>
 
-<input type="hidden" name="prodNo" value="${product.prodNo}"/>
+<div class="container">
 
-<table width="100%" height="37" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td width="15" height="37">
-			<img src="../images/ct_ttl_img01.gif" width="15" height="37"/>
-		</td>
-		<td background="../images/ct_ttl_img02.gif" width="100%" style="padding-left: 10px;">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="93%" class="ct_ttl01">상품수정</td>
-					<td width="20%" align="right">&nbsp;</td>
-				</tr>
-			</table>
-		</td>
-		<td width="12" height="37">
-			<img src="../images/ct_ttl_img03.gif" width="12" height="37"/>
-		</td>
-	</tr>
-</table>
+	<div class="page-header col-sm-offset-2 col-sm-10">
+		<h1>상품 정보 수정</h1>
+	</div>
+	<form class="update-product form-horizontal">
+		<div class="form-group">
+			<input type="hidden" name="prodNo" value="${product.prodNo }"/>
+			<div class="row">
+				<label for="inputProdName" class="col-sm-3 control-label">상품명</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" id="inputProdName" name="prodName" value="${product.prodName}" placeholder="상품명">
+				</div>
+				<span class="col-sm-6"></span>
+			</div>
+			<br/>
+			<div class="row">
+				<label for="inputProdDetail" class="col-sm-3 control-label">상품상세정보</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" id="inputProdDetail" name="prodDetail" value="${product.prodDetail}" placeholder="상세정보">
+				</div>
+			</div>
+			<br/>
+			<div class="row">
+				<label for="inputStock" class="col-sm-3 control-label">추가수량</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" id="inputStock" name="stock" >
+				</div>
+				<span class="col-sm-6">(현재 수량 : ${product.stock})</span>
+			</div>
+			<br/>
+			<div class="row">
+				<label for="inputManuDate" class="col-sm-3 control-label">제조일자</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" id="inputManuDate" name="manuDate" value="${product.manuDate}" readonly>
+				</div>
+				<span class="col-sm-6"></span>
+			</div>
+			<br/>
+			<div class="row">
+				<label for="inputPrice" class="col-sm-3 control-label">가격</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" id="inputPrice" name="price" value="${product.price}">
+				</div>
+				<span class="col-sm-6"></span>
+			</div>
+			<br/>
+			<div class="row">
+				<label for="inputFile" class="col-sm-3 control-label">상품이미지</label>
+				<div class="col-sm-6">
+					<input type="file" class="form-control" id="inputFile" name="file">
+				</div>
+				<span class="col-sm-3"></span>
+			</div>
+			<div class="row">
+				<label for="inputCurrent" class="col-sm-3 control-label">현재 이미지</label>
+				<div class="col-sm-6">
+					<c:if test="${!empty product.fileName}">
+						<img src="../images/uploadFiles/${product.fileName}" style="height: 200px; width: 100%;"/>
+					</c:if>
+					<c:if test="${empty product.fileName}">
+						등록된 파일이 없습니다.
+					</c:if>
+				</div>
+				<span class="col-sm-3"></span>
+			</div>
+			<br/>
+			<div class="row">
+				<div class="col-sm-offset-3 col-sm-9">
+					<button type="button" class="btn btn-success">
+						수정하기
+					</button>
+					
+					<!-- Modal -->
+					<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-body">
+									<!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+									<h4 class="modal-title" id="myModalLabel">상품 정보 수정 중입니다..</h4>
+								</div>
+							</div>
+						</div>
+					</div>
 
-<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 13px;">
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">
-			상품명<img src="../images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="105">
-						<input 	type="text" name="prodName" class="ct_input_g" 
-										style="width: 100px; height: 19px" maxLength="20" value="${product.prodName}"/>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">
-			추가 수량<img src="../images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="105">
-						<input 	type="text" name="stock" class="ct_input_g" 
-										style="width: 100px; height: 19px" maxLength="20" value="0"/>(현재 남은 수량 : ${product.stock })
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">
-			상품상세정보 <img src="../images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<input type="text" name="prodDetail" value="${product.prodDetail}" class="ct_input_g" 
-						style="width: 100px; height: 19px" maxLength="10"	minLength="6">
-		</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">
-			제조일자 <img src="../images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<input type="text" readonly="readonly" name="manuDate" value="${product.manuDate}" 	
-						class="ct_input_g" style="width: 100px; height: 19px" maxLength="10" minLength="6">&nbsp;
-						<img 	src="../images/ct_icon_date.gif" width="15" height="15"  />
-		</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">
-			가격 <img src="../images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
-		</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<input type="text" name="price" value="${product.price}"
-						class="ct_input_g" style="width: 100px; height: 19px" maxLength="50"/>&nbsp;원</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-	<tr>
-		<td width="104" class="ct_write">상품이미지</td>
-		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01">
-			<input	type="file" name="file" class="ct_input_g" 
-						style="width: 200px; height: 19px" maxLength="13" value="${!empty product.fileName ? product.fileName : ''}"/>
-		</td>
-	</tr>
-	<tr>
-		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
-	</tr>
-</table>
-
-<table width="100%" border="0" cellspacing="0" cellpadding="0"	style="margin-top: 10px;">
-	<tr>
-		<td width="53%"></td>
-		<td align="right">
-			<table border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="17" height="23">
-						<img src="../images/ct_btnbg01.gif" width="17" height="23"/>
-					</td>
-					<td background="../images/ct_btnbg02.gif" class="ct_btn01"	style="padding-top: 3px;">
-						수정
-					</td>
-					<td width="14" height="23">
-						<img src="../images/ct_btnbg03.gif" width="14" height="23"/>
-					</td>
-					<td width="30"></td>
-					<td width="17" height="23">
-						<img src="../images/ct_btnbg01.gif"width="17" height="23"/>
-					</td>
-					<td background="../images/ct_btnbg02.gif" class="ct_btn01" style="padding-top: 3px;">
-						취소
-					</td>
-					<td width="14" height="23">
-						<img src="../images/ct_btnbg03.gif" width="14" height="23"/>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
-</form>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
 
 </body>
 </html>

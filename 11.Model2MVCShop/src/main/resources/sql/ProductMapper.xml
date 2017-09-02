@@ -55,7 +55,7 @@
 			manufacture_day=#{manuDate:VARCHAR},
 			price =	<if test="price==0">null</if>
 					<if test="price!=0">#{price}</if>,
-			image_file=#{fileName:VARCHAR},
+			<if test="fileName!=''">image_file=#{fileName:VARCHAR},</if>
 			stock=stock+	<if test="stock==0">0</if>
 							<if test="stock!=0">#{stock}</if>
 		</set>
@@ -157,5 +157,57 @@
 			prod_name LIKE '%${value}%'
 	</select>
 	
+	<select id="newestProduct" resultMap="productSelectMap">
+		SELECT
+			p1.prod_no, p1.prod_name, p1.image_file
+		FROM
+			product p1, product p2
+		GROUP BY
+			p1.prod_no, p1.prod_name, p1.image_file
+		HAVING
+			p1.prod_no IN MAX(p2.prod_no)
+	</select>
+	
+	<select id="hottestProduct" resultMap="productSelectMap">
+		SELECT
+			p.prod_no, p.prod_name, p.image_file, it.tc stock
+		FROM
+			product p, (SELECT
+							t.prod_no, ROWNUM itr, t.tc
+						FROM
+							(SELECT 
+								prod_no, count(*) tc
+							 FROM
+							 	transaction
+							 GROUP BY
+							 	prod_no
+							 ORDER BY tc DESC
+							)t
+						)it
+		WHERE
+			p.prod_no IN (it.prod_no)
+		ORDER BY
+			it.itr
+	</select>
+	
+	<select id="replytopProduct" resultMap="productSelectMap">
+		SELECT
+			p.prod_no, p.prod_name, p.image_file
+		FROM
+			product p, (SELECT
+							r.prod_no, ROWNUM irr
+						FROM
+							(SELECT 
+								prod_no, count(*) rc
+							 FROM
+							 	reply
+							 GROUP BY
+							 	prod_no
+							 ORDER BY rc DESC
+							)r
+						)ir
+		WHERE
+			irr IN 1 AND p.prod_no IN (ir.prod_no)
+	</select>
 	
 </mapper>

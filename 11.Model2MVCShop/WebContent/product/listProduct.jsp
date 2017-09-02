@@ -43,23 +43,30 @@
 					'Content-Type' : 'application/json'
 				},
 				success : function(JSON){
-					var i = JSON.resultPage.totalCount - (JSON.resultPage.currentPage-1)*JSON.resultPage.pageSize + 1;
 					var list = '';
 					for( x in JSON.list){
-						i--;
 						var product = JSON.list[x];
-						list += '<div class="col-sm-6 col-md-4"><div class="thumbnail">';
-						list += '<img src="../images/uploadFiles/'+(product.fileName!=null ? product.fileName : 'empty'+Math.floor(3*Math.random())+'.GIF')+'" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">';
+						list += '<div class="col-sm-6 col-md-4"><div class="thumbnail alert alert-'+(product.stock==0? 'danger':'warning')+'">';
+						list += '<img src="../images/uploadFiles/'+(product.fileName!=null ? product.fileName : 'empty'+Math.floor(3*Math.random())+'.GIF')+'" class="img-responsive" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">';
 						list += '<div class="caption">';
 						list += '<input type="hidden" name="prodNo" value="'+product.prodNo+'">';
 						list += '<h3>'+product.prodName+'</h3>';
-						list += '<p>'+product.prodDetail+'</p>';
 						list += '<p>';
-						list += '<a href="#" class="btn btn-primary" role="button">상세보기</a>';
-						list += '<a href="#" class="btn btn-default" role="button">구매</a>';
+						list += '<div class="btn-group" role="group">';
+						list += '<a href="#" class="btn btn-primary" role="button">';
+						if($('input:hidden[name="menu"]').val()=='manage'){
+							list += '정보수정';
+						}else{
+							list += '상세보기';
+						}
+						list += '</a>';
+						if($('input:hidden[name="userId"]').val() != '' && $('input:hidden[name="menu"]').val()=='search'){
+							list += '<a href="#" class="btn btn-default" role="button">구매</a>';
+						}
+						list += '</div>';
 						list += '</p></div></div></div>';
 					}
-					$('.bs-docs-section .row').html($('.bs-docs-section .row').html() + list);
+					$('.col-md-9 > .row').html($('.col-md-9 > .row').html() + list);
 					
 					init();
 				}
@@ -67,10 +74,14 @@
 		}
 		
 		function init(){
-			$('a.btn-primary:contains("상세보기")').bind('click',function(){
+			$('a.btn-primary:contains("상세보기"), a.btn-primary:contains("정보수정")').unbind('click').bind('click',function(){
 				self.location.href='getProduct?menu=${param.menu}&prodNo='+$(this).parent().parent().find('input:hidden').val();
 			});
-		}
+			
+			$('a.btn-default:contains("구매")').unbind('click').bind('click',function(){
+				self.location.href='../purchase/addPurchase?prodNo='+$(this).parent().parent().find('input:hidden[name="prodNo"]').val();
+			});
+		};
 		
 		$( function() {
 			while($(document).height() == $(window).height() && currentPage < $('input:hidden[name="maxPage"]').val()){
@@ -87,6 +98,7 @@
 				}
 			}
 		});
+		
 	</script>
 </head>
 
@@ -98,17 +110,26 @@
 	
 	<input type="hidden" name="menu" value="${param.menu}"/>
 	<input type="hidden" name="maxPage" value="${resultPage.maxPage}"/>
+	<input type="hidden" name="userId" value="${sessionScope.user.userId}"/>
 	
-	<div class="container bs-docs-container">
+	<div class="container">
 		<div class="row">
 			<div class="col-md-9" role="main">
-				<div class="bs-docs-section">
-					<div class="row">
-					
-					</div>
+				<div class="page-header col-sm-offset-2 col-sm-10">
+					<c:if test="${param.menu=='manage'}">
+						<h1>상품 관리</h1>
+					</c:if>
+					<c:if test="${param.menu=='search'}">
+						<h1>상품 구매</h1>
+					</c:if>
+				</div>
+				<div class="row">
+				
 				</div>
 			</div>
-			<jsp:include page="../history.jsp"/>
+			<jsp:include page="../history.jsp">
+				<jsp:param name="uri" value="../"/>
+			</jsp:include>
 		</div>
 	</div>
 	

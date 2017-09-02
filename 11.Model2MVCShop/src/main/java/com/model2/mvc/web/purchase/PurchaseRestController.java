@@ -98,6 +98,20 @@ public class PurchaseRestController {
 		return this.getList(search);
 	}
 	
+	@RequestMapping( value="updateTranCode/{tranNo}/{tranCode}", method=RequestMethod.GET )
+	public boolean updateTranCode(	@PathVariable int tranNo,
+									@PathVariable String tranCode	) throws Exception{
+		
+		Purchase updatePurchase = new Purchase();
+		updatePurchase.setTranNo(tranNo);
+		updatePurchase = purchaseService.getPurchase(updatePurchase);
+		updatePurchase.setTranCode(tranCode);
+		
+		purchaseService.updatePurchase(updatePurchase);
+		
+		return true;
+	}
+	
 	
 	
 	private Map<String, Object> getList(Search search) throws Exception{

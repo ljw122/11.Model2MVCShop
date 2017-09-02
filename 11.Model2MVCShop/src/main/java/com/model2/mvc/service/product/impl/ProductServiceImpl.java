@@ -73,5 +73,11 @@ public class ProductServiceImpl implements ProductService {
 		return productDao.getProductNames(prodName);
 	}
 
+	@Override
+	public Map<String, Object> getIndexProductList() throws Exception {
+		// TODO Auto-generated method stub
+		return productDao.getIndexProductList();
+	}
+
 	
 }

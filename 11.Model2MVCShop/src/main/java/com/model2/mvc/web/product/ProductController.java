@@ -1,7 +1,5 @@
 package com.model2.mvc.web.product;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,14 +60,10 @@ public class ProductController {
 	
 	@RequestMapping( value="addProduct", method=RequestMethod.POST )
 	public ModelAndView addProduct( @ModelAttribute("product") Product product,
-									@RequestParam("file") MultipartFile file		) throws Exception{
+									@RequestParam(value="file", required=false) MultipartFile file		) throws Exception{
 		
 		product.setFileName("");
-		if(!file.isEmpty()){
-			FileOutputStream fos = new FileOutputStream(new File(fsr.getPath(), file.getOriginalFilename()));
-			fos.write(file.getBytes());
-			fos.flush();
-			fos.close();
+		if(file != null && !file.isEmpty()){
 			product.setFileName(file.getOriginalFilename());
 		}
 		
@@ -119,11 +113,10 @@ public class ProductController {
 	
 	@RequestMapping( value="updateProduct", method=RequestMethod.POST )
 	public ModelAndView updateProduct(	@ModelAttribute("product") Product product,
-										@RequestParam("file") MultipartFile file	) throws Exception{
+										@RequestParam(value="file", required=false) MultipartFile file	) throws Exception{
 
-
-		if(!file.isEmpty()){
-			file.transferTo(new File(fsr.getPath(), file.getOriginalFilename()));
+		product.setFileName("");
+		if(file != null && !file.isEmpty()){
 			product.setFileName(file.getOriginalFilename());
 		}
 		

@@ -80,6 +80,23 @@ public class ProductRestController {
 		
 		return product;
 	}
+
+	@RequestMapping( value="uploadFile", method=RequestMethod.POST )
+	public boolean uploadFile( @RequestParam("file") MultipartFile file ) throws Exception{
+		
+		boolean result = false;
+		
+		if(!file.isEmpty()){
+			try{
+				file.transferTo(new File(fsr.getPath(),file.getOriginalFilename()));
+				result = true;
+			}catch(Exception e){
+				System.out.println(file.getOriginalFilename()+" upload fail;");
+			}
+		}
+		
+		return result;
+	}
 	
 	@RequestMapping( value="getProduct/{menu}/{prodNo}", method=RequestMethod.GET )
 	public Map<String, Object> getProduct(	@PathVariable String menu,
@@ -188,6 +205,11 @@ public class ProductRestController {
 	public List<String> getProductNames(@PathVariable String value) throws Exception{
 		List<String> list = productService.getProductNames(value); 
 		return list;
+	}
+	
+	@RequestMapping( value="getIndexProductList", method=RequestMethod.GET )
+	public Map<String, Object> getIndexProductList() throws Exception{
+		return productService.getIndexProductList();
 	}
 	
 }

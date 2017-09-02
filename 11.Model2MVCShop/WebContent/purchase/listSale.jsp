@@ -1,40 +1,57 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%>
+<%@ page contentType="text/html; charset=euc-kr" %>
+<%@ page pageEncoding="EUC-KR" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%-- root에서 실행 --%>
+
+<% int index = (int)(java.lang.Math.random()*3.0); %>
+
+<!DOCTYPE html>
 
 <html>
 <head>
-	<title>판매 목록조회</title>
+	<title>Model2 MVC Shop</title>
+	<meta charset="EUC-KR">
 	
-	<link rel="stylesheet" href="../css/admin.css" type="text/css">
+	<!-- 참조 : http://getbootstrap.com/css/   -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	
-	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<!--  ///////////////////////// Bootstrap, jQuery CDN ////////////////////////// -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
+	
+	<style>
+		body{
+			padding-top : 70px;
+		}
+	</style>
+	
 	<script type="text/javascript">
-		var currentPage = 1,
+		var currentPage = 0,
 			searchKeyword = 'saleList';
 		
 		function init(){
-			$('.ct_list_pop:nth-child(2n+2)').css('background-color','rgb(220, 245, 245)');
 
-			$('.ct_list_pop span:nth-child(1)').css('width', '70px').css('display','inline-block')
+			$('td:nth-child(1)')
 				.bind('click',function(){
 					self.location = 'getPurchase?tranNo='+$(this).find('input:hidden').val();
 				});
 			
-			$('.ct_list_pop span:nth-child(2)').css('width', '180px').css('display','inline-block')
+			$('td:nth-child(2)')
 				.bind('click',function(){
 					self.location = '../product/getProduct?prodNo='+$(this).find('input:hidden').val()+'&menu=manage';
 				});
 			
-			$('.ct_list_pop span:nth-child(3)').css('width', '150px').css('display','inline-block')
+			$('td:nth-child(3)')
 				.bind('click',function(){
 					self.location = '../user/getUser?userId='+$(this).text().trim();
 				});
-			$('.ct_list_pop span:nth-child(4)').css('width', '150px').css('display','inline-block')
 			
-			$('.ct_list_pop span:nth-child(6):contains("배송하기")').css('width', '70px').css('display','inline-block').css('float','right')
+			$('td:nth-child(6):contains("배송하기")')
 				.bind('click',function(){
 					self.location = 'updateTranCode?tranNo='+$(this).find('input:hidden').val()+'&tranCode=2&menu=manage';
 				});
@@ -60,24 +77,28 @@
 					for( x in JSON.list){
 						i--;
 						var sale = JSON.list[x];
-						var list = '<div class="ct_list_pop">';
-						list += '<span><input type="hidden" name="tranNo" value="'+sale.tranNo+'">'+i+'</span>';
-						list += '<span><input type="hidden" name="prodNo" value="'+sale.purchaseProd.prodNo+'">'+sale.purchaseProd.prodName+' (수량 : '+sale.purchaseCount+')</span>';
-						list += '<span>'+sale.buyer.userId+'</span>';
-						list += '<span>'+sale.dlvyDate+'</span>';
-						list += '<span>';
-						if(sale.tranCode == 1){
+						var list = '<tr>';
+						list += '<td><input type="hidden" name="tranNo" value="'+sale.tranNo+'">'+i+'</td>';
+						list += '<td><input type="hidden" name="prodNo" value="'+sale.purchaseProd.prodNo+'">'+sale.purchaseProd.prodName+' (수량 : '+sale.purchaseCount+')</td>';
+						list += '<td>'+sale.buyer.userId+'</td>';
+						list += '<td>'+sale.dlvyDate+'</td>';
+						list += '<td>'
+						if(sale.tranCode == '1'){
 							list += '구매완료';
-						}else if(sale.tranCode == 2){
+						}else if(sale.tranCode == '2'){
 							list += '배송중';
-						}else{
+						}else if(sale.tranCode == '3'){
 							list += '배송완료';
 						}
-						list += '</span>';
-						list += '<span>'+(sale.tranCode == 1 ? '<input type="hidden" name="tranNo" value="'+sale.tranNo+'">배송하기' : '')+'</span>';
-						list += '</div>';
+						list += '</td>';
+						list += '<td>';
+						if(sale.tranCode == '1'){
+							list += '<input type="hidden" name="tranNo" value="'+sale.tranNo+'">배송하기';
+						}
+						list += '</td>';
+						list += '</tr>';
 						
-						$('div.sale_list').html($('div.sale_list').html() + list);
+						$('tbody').html($('tbody').html() + list);
 					}
 					init();
 				}
@@ -91,6 +112,26 @@
 			}
 		});
 
+		$(function(){
+			
+			$.ajax({
+				url : '../product/json/getIndexProductList',
+				method : 'get',
+				dataType : 'json',
+				headers : {
+					'Accept' : 'application/json',
+					'Content-Type' : 'application/json'
+				},
+				success : function(data){
+					var i;
+					for(i=0; i<4 ; i++){
+						$($('.popular')[i]).find('img').attr('src','../images/uploadFiles/'+(data.HP[i].fileName!=null ? data.HP[i].fileName : 'empty'+Math.floor(3*Math.random())+'.GIF'));
+						$($('.popular')[i]).find('span').text(data.HP[i].stock);
+						$($('.popular')[i]).find('h4').append(data.HP[i].prodName);
+					}
+				}
+			});
+		});
 		$(window).scroll(function(event){
 			if(currentPage < $('input:hidden[name="maxPage"]').val()){
 				if(pageYOffset == ($(document).height()-$(window).height())){
@@ -106,91 +147,62 @@
 
 <body bgcolor="#ffffff" text="#000000">
 
-<div style="width: 98%; margin-left: 10px;">
+	<jsp:include page="../layout/menubar.jsp">
+		<jsp:param name="uri" value="../"/>
+	</jsp:include>
 
-<form name="detailForm">
-<input type="hidden" name="maxPage" value="${resultPage.maxPage}"/>
-<table width="100%" height="37" border="0" cellpadding="0"	cellspacing="0">
-	<tr>
-		<td width="15" height="37"><img src="../images/ct_ttl_img01.gif"width="15" height="37"></td>
-		<td background="../images/ct_ttl_img02.gif" width="100%" style="padding-left: 10px;">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="93%" class="ct_ttl01">판매 목록조회</td>
-				</tr>
-			</table>
-		</td>
-		<td width="12" height="37"><img src="../images/ct_ttl_img03.gif"	width="12" height="37"></td>
-	</tr>
-</table>
-
-<table width="100%" border="0" cellspacing="0" cellpadding="0"	style="margin-top: 10px;">
-	<tr>
-		<td colspan="11">
-			전체 ${resultPage.totalCount} 건수, 현재 ${resultPage.currentPage} 페이지
-		</td>
-	</tr>
-	<tr>
-		<td class="ct_list_b" width="70">No</td>
-		<td class="ct_line02"></td>
-		<td class="ct_list_b" width="180">상품명</td>
-		<td class="ct_line02"></td>
-		<td class="ct_list_b" width="150">구매자 ID</td>
-		<td class="ct_line02"></td>
-		<td class="ct_list_b" width="150">배송 희망일</td>
-		<td class="ct_line02"></td>
-		<td class="ct_list_b">현재상태</td>
-		<td class="ct_line02"></td>
-		<td class="ct_list_b">배송현황</td>
-	</tr>
-	<tr>
-		<td colspan="11" bgcolor="808285" height="1"></td>
-	</tr>
-</table>
-
-<div class="sale_list">
-	<c:set var="i" value="${resultPage.totalCount- (resultPage.currentPage-1)*resultPage.pageSize + 1}"/>
-	<c:forEach var="purchase" items="${list}">	
-		<c:set var="i" value="${i-1}"/>
-		<div class="ct_list_pop">
-			<span>
-				<input type="hidden" name="tranNo" value="${purchase.tranNo}">
-				${i}
-			</span>
-			<span>
-				<input type="hidden" name="prodNo" value="${purchase.purchaseProd.prodNo}">
-				${purchase.purchaseProd.prodName} (수량 : ${purchase.purchaseCount })
-			</span>
-			<span>${purchase.buyer.userId}</span>
-			<span>${purchase.dlvyDate}</span>
-			<span>
-				<c:choose>
-					<c:when test="${purchase.tranCode=='1' }">
-						구매완료
-					</c:when>
-					<c:when test="${purchase.tranCode=='2' }">
-						배송중
-					</c:when>
-					<c:when test="${purchase.tranCode=='3' }">
-						배송완료
-					</c:when>
-				</c:choose>
-			</span>
-			<span>
-				<c:if test="${purchase.tranCode=='1'}">
-					<input type="hidden" name="tranNo" value="${purchase.tranNo}">
-					배송하기
-				</c:if>
-			</span>
-		</div>
-	</c:forEach>
+	<div class="container">
 	
-</div>
+		<div class="row">
+			<h1 class="page-header">인기품목</h1>
+			
+			<div class="row">
+				<div class="col-xs-12 col-sm-3 popular">
+					<h4><span class="badge"></span></h4>
+					<img src="../images/others/ajax_loader4.gif" class="img-responsive img-circle" style="width:200px; height:200px;">
+				</div>
+				<div class="col-xs-12 col-sm-3 popular">
+					<h4><span class="badge"></span></h4>
+					<img src="../images/others/ajax_loader4.gif" class="img-responsive img-circle" style="width:150px; height:150px;">
+				</div>
+				<div class="col-xs-12 col-sm-3 popular">
+					<h4><span class="badge"></span></h4>
+					<img src="../images/others/ajax_loader4.gif" class="img-responsive img-circle" style="width:100px; height:100px;">
+				</div>
+				<div class="col-xs-12 col-sm-3 popular">
+					<h4><span class="badge"></span></h4>
+					<img src="../images/others/ajax_loader4.gif" class="img-responsive img-circle" style="width:80px; height:80px;">
+				</div>
+			</div>
+		</div>
 
+		<hr/>
+		
+		<div class="text-info">
+			<h3>판매목록조회</h3>
+	    </div>
 
-</form>
-
-</div>
-
+		<input type="hidden" name="maxPage" value="${resultPage.maxPage}"/>
+		<table class="table table-hover table-striped" >
+      
+			<thead>
+				<tr>
+					<th>No</th>
+					<th>상품명</th>
+					<th>구매자 ID</th>
+					<th>배송 희망일</th>
+					<th>현재상태</th>
+					<th>배송현황</th>
+				</tr>
+			</thead>
+       
+			<tbody>
+		
+			</tbody>
+      
+      </table>
+		
+		
+	</div>
 </body>
 </html>

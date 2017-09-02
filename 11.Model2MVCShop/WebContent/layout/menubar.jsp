@@ -133,7 +133,7 @@
 	$(function(){
 	
 		$("a.user-info").bind("click",function(){
-			self.location.href="${param.uri}user/getUser?userId=${user.userId}";
+			self.location.href="${param.uri}user/getUser?userId=${sessionScope.user.userId}";
 		});
 	
 		$("a:contains('회원정보조회')").bind("click", function(){

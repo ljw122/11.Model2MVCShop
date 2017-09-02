@@ -23,4 +23,5 @@ public interface ProductDao {
 
 	public List<String> getProductNames(String prodName) throws Exception;
 
+	public Map<String, Object> getIndexProductList() throws Exception;
 }

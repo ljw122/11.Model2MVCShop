@@ -73,4 +73,13 @@ public class ProductDaoImpl implements ProductDao{
 		}
 		return returnList;
 	}
+	
+	public Map<String,Object> getIndexProductList() throws Exception{
+		Map<String,Object> map = new HashMap<String,Object>();
+		
+		map.put("NP", sqlSession.selectOne("ProductMapper.newestProduct"));
+		map.put("HP", sqlSession.selectList("ProductMapper.hottestProduct"));
+		map.put("RP", sqlSession.selectOne("ProductMapper.replytopProduct"));
+		return map;
+	}
 }
